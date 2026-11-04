@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B6E4F">
+<title>Catatan Keuangan</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:light dark;--bg:#F4F7F5;--card:#fff;--text:#16211C;--muted:#5E6B65;--line:#E3E9E6;--primary:#0B6E4F;--on-primary:#fff;--hero:#B8F2D3;--on-hero:#002114;--chip:#EEF3F0;--green:#2E9E5B;--red:#E5484D}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1412;--card:#1A211E;--text:#E3EAE6;--muted:#9AA7A1;--line:#2A3430;--primary:#6FD6A6;--on-primary:#003824;--hero:#0F5137;--on-hero:#B8F2D3;--chip:#24302B}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+button,input{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:12px 8px 8px 16px;padding-top:calc(12px + env(safe-area-inset-top))}
+header h1{font-size:20px}
+.icon-btn{background:none;border:none;font-size:24px;padding:4px 14px;border-radius:10px;cursor:pointer}
+main{max-width:640px;margin:0 auto;padding:4px 16px 160px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px}
+.card h3{font-size:16px;margin-bottom:10px}
+.hero{background:var(--hero);color:var(--on-hero)}
+.besar{font-size:30px;font-weight:700;margin:2px 0 12px}
+.baris{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0}
+.muted{color:var(--muted)}
+.hero .muted{color:inherit;opacity:.75}
+.hijau{color:var(--green)}.merah{color:var(--red)}.tebal{font-weight:600}
+small{font-size:13px}
+.bulan{display:flex;align-items:center;justify-content:space-between;margin:4px 0 8px}
+.bulan b{font-size:17px}
+.bar-item{margin-bottom:10px}
+.bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--primary) 15%,transparent);overflow:hidden;margin-top:4px}
+.bar div{height:100%;background:var(--primary)}
+.bar.merah{background:color-mix(in srgb,var(--red) 15%,transparent)}
+.bar.merah div{background:var(--red)}
+.ringkas{display:flex;justify-content:space-between;gap:8px}
+.ringkas div{display:flex;flex-direction:column;gap:2px}
+.ringkas b{font-size:14px}
+.hari{display:flex;justify-content:space-between;color:var(--primary);font-weight:600;font-size:14px;margin:16px 4px 8px}
+.hari small{color:var(--muted);font-weight:400}
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;padding:12px 16px}
+.item2{cursor:pointer}
+.kiri{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kiri small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kosong{text-align:center;color:var(--muted);margin-top:32px;line-height:1.6}
+.kecil{font-size:13px;margin:4px 4px 8px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;background:none;border:none;color:var(--muted);padding:8px 0 10px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+nav button span{font-size:20px}
+nav button.on{color:var(--primary);font-weight:600}
+.fab{position:fixed;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));background:var(--primary);color:var(--on-primary);border:none;border-radius:16px;padding:16px 20px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:6;cursor:pointer}
+.menu{position:fixed;right:12px;top:calc(56px + env(safe-area-inset-top));background:var(--card);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:10;overflow:hidden}
+.menu button{display:block;width:100%;text-align:left;background:none;border:none;padding:14px 20px;cursor:pointer}
+dialog{border:none;border-radius:20px;padding:0;width:min(560px,94vw);max-height:90vh;overflow:auto;background:var(--card);color:var(--text);margin:auto}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{padding:20px;display:flex;flex-direction:column;gap:12px}
+.dlg h2{font-size:20px}.dlg h2:focus{outline:none}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.lbl{font-size:13px;color:var(--muted)}
+input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:16px;color:var(--text)}
+input:focus{outline:2px solid var(--primary);border-color:transparent}
+.rp{position:relative;display:block}
+.rp>span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
+.rp input{padding-left:42px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--chip);border-radius:20px;padding:7px 14px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.cek{flex-direction:row;align-items:center;gap:10px;color:var(--text)}
+.cek input{width:20px;height:20px;flex:none}
+.aksi{display:flex;align-items:center;gap:8px;margin-top:4px}
+.aksi .spacer{flex:1}
+.teks{background:none;border:none;padding:10px 12px;border-radius:10px;font-weight:600;color:var(--primary);cursor:pointer}
+.teks.merah{color:var(--red)}
+.utama{background:var(--primary);color:var(--on-primary);border:none;border-radius:20px;padding:10px 22px;font-weight:600;cursor:pointer}
+.utama:disabled{opacity:.4}
+.toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="judul">Catatan Keuangan</h1>
+  <button class="icon-btn" id="tombolMenu" aria-label="Menu">⋮</button>
+</header>
+<div class="menu" id="menu" hidden>
+  <button data-menu="backup">💾 Backup ke file</button>
+  <button data-menu="restore">📂 Restore dari file</button>
+  <button data-menu="csv">📤 Ekspor CSV</button>
+</div>
+<input type="file" id="fileRestore" hidden>
+
+<main id="isi"></main>
+
+<button class="fab" id="fab">+ Transaksi</button>
+<nav>
+  <button data-tab="ringkasan"><span>📊</span>Ringkasan</button>
+  <button data-tab="transaksi"><span>💸</span>Transaksi</button>
+  <button data-tab="investasi"><span>📈</span>Investasi</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<!-- Form transaksi -->
+<dialog id="dlgTrx">
+  <div class="dlg">
+    <h2 id="judulTrx" tabindex="-1" autofocus>Tambah Transaksi</h2>
+    <div class="chips" id="jenisTrx">
+      <button type="button" class="chip" data-v="keluar">Pengeluaran</button>
+      <button type="button" class="chip" data-v="masuk">Pemasukan</button>
+    </div>
+    <label>Jumlah<span class="rp"><span>Rp</span><input id="jumlahTrx" inputmode="numeric" autocomplete="off" placeholder="0"></span></label>
+    <p class="lbl">Kategori</p>
+    <div class="chips" id="katTrx"></div>
+    <label>Tanggal<input type="date" id="tglTrx"></label>
+    <label>Catatan (opsional)<input id="catTrx" maxlength="100" autocomplete="off"></label>
+    <div class="aksi">
+      <button type="button" class="teks merah" id="hapusTrx">Hapus</button>
+      <span class="spacer"></span>
+      <button type="button" class="teks" data-tutup>Batal</button>
+      <button type="button" class="utama" id="simpanTrx">Simpan</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Form investasi -->
+<dialog id="dlgInv">
+  <div class="dlg">
+    <h2 id="judulInv" tabindex="-1" autofocus>Tambah Investasi</h2>
+    <label>Nama aset<input id="namaInv" maxlength="60" autocomplete="off" placeholder="mis. BBCA, Emas Antam, RD Pasar Uang"></label>
+    <p class="lbl">Jenis</p>
+    <div class="chips" id="jenisInv"></div>
+    <label>Total modal<span class="rp"><span>Rp</span><input id="modalInv" inputmode="numeric" autocomplete="off" placeholder="0"></span><small>Tambahkan di sini jika Anda top up</small></label>
+    <label>Nilai sekarang<span class="rp"><span>Rp</span><input id="nilaiInv" inputmode="numeric" autocomplete="off" placeholder="sama dengan modal"></span><small>Kosongkan jika sama dengan modal</small></label>
+    <div id="pratinjauInv"></div>
+    <label>Tanggal beli<input type="date" id="tglInv"></label>
+    <label>Catatan (opsional)<input id="catInv" maxlength="100" autocomplete="off"></label>
+    <label class="cek" id="barisCatat"><input type="checkbox" id="catatKeluar">Catat juga sebagai pengeluaran (uang diambil dari saldo kas)</label>
+    <div class="aksi">
+      <button type="button" class="teks merah" id="hapusInv">Hapus</button>
+      <span class="spacer"></span>
+      <button type="button" class="teks" data-tutup>Batal</button>
+      <button type="button" class="utama" id="simpanInv">Simpan</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const KATEGORI_KELUAR = ["Makan & Minum","Transportasi","Belanja","Tagihan","Pulsa & Internet","Hiburan","Kesehatan","Pendidikan","Investasi","Sedekah","Lainnya"];
+const KATEGORI_MASUK = ["Gaji","Bonus/THR","Usaha","Hasil Investasi","Hadiah","Lainnya"];
+const JENIS_INVESTASI = ["Saham","Reksa Dana","Emas","Kripto","Deposito","Obligasi/SBN","Properti","Lainnya"];
+
+// ===== Data: disimpan di HP (localStorage) =====
+const KUNCI = "catatanKeuangan";
+let data = { transaksi: [], investasi: [] };
+try {
+  const s = JSON.parse(localStorage.getItem(KUNCI));
+  if (s && Array.isArray(s.transaksi) && Array.isArray(s.investasi)) data = s;
+} catch (e) {}
+const simpan = () => localStorage.setItem(KUNCI, JSON.stringify(data));
+const idBaru = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const urutkan = () => data.transaksi.sort((a, b) =>
+  b.tanggal.localeCompare(a.tanggal) || String(b.id).localeCompare(String(a.id)));
+
+// ===== Format =====
+const $ = id => document.getElementById(id);
+const fmt = new Intl.NumberFormat("id-ID");
+const rp = n => (n < 0 ? "-Rp" : "Rp") + fmt.format(Math.abs(n));
+const rpTanda = n => (n > 0 ? "+" : "") + rp(n);
+const persen = p => (p > 0 ? "+" : "") + p.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+const warna = n => (n >= 0 ? "hijau" : "merah");
+const total = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
+const angkaDari = s => parseInt(String(s).replace(/\D/g, ""), 10) || 0;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const dua = n => String(n).padStart(2, "0");
+const hariIni = () => { const d = new Date(); return `${d.getFullYear()}-${dua(d.getMonth() + 1)}-${dua(d.getDate())}`; };
+const keDate = t => { const [y, m, d] = t.split("-").map(Number); return new Date(y, m - 1, d || 1); };
+const fmtTgl = (t, opsi) => keDate(t).toLocaleDateString("id-ID", opsi);
+const labelBulan = b => fmtTgl(b, { month: "long", year: "numeric" });
+const geserBulan = (b, n) => { const d = keDate(b); d.setMonth(d.getMonth() + n); return `${d.getFullYear()}-${dua(d.getMonth() + 1)}`; };
+
+let timerToast;
+function toast(teks) {
+  const t = $("toast"); t.textContent = teks; t.classList.add("on");
+  clearTimeout(timerToast); timerToast = setTimeout(() => t.classList.remove("on"), 2500);
+}
+
+// ===== Tampilan =====
+let tab = "ringkasan";
+let bulan = hariIni().slice(0, 7);
+
+const htmlBaris = (label, nilai, kelas = "") =>
+  `<div class="baris"><span class="muted">${label}</span><span class="${kelas}">${nilai}</span></div>`;
+const htmlBulan = () =>
+  `<div class="bulan"><button class="icon-btn" data-aksi="bulan" data-n="-1">‹</button><b>${labelBulan(bulan)}</b><button class="icon-btn" data-aksi="bulan" data-n="1">›</button></div>`;
+const htmlBar = (label, nilai, semua, kelas = "") => {
+  const p = semua > 0 ? Math.min(100, (nilai / semua) * 100) : 0;
+  return `<div class="bar-item"><div class="baris"><span>${esc(label)}</span><small class="muted">${rp(nilai)} · ${Math.round(p)}%</small></div><div class="bar ${kelas}"><div style="width:${p}%"></div></div></div>`;
+};
+
+function htmlRingkasan() {
+  const tb = data.transaksi.filter(t => t.tanggal.startsWith(bulan));
+  const masuk = total(tb.filter(t => t.pemasukan), t => t.jumlah);
+  const keluar = total(tb.filter(t => !t.pemasukan), t => t.jumlah);
+  const kas = total(data.transaksi, t => (t.pemasukan ? t.jumlah : -t.jumlah));
+  const nilaiInv = total(data.investasi, i => i.nilai);
+  const modalInv = total(data.investasi, i => i.modal);
+  const untung = nilaiInv - modalInv;
+  const perKat = {};
+  tb.filter(t => !t.pemasukan).forEach(t => (perKat[t.kategori] = (perKat[t.kategori] || 0) + t.jumlah));
+  const kat = Object.entries(perKat).sort((a, b) => b[1] - a[1]);
+  return `
+  <div class="card hero">
+    <small>Total Kekayaan</small>
+    <div class="besar">${rp(kas + nilaiInv)}</div>
+    ${htmlBaris("Saldo kas", rp(kas))}
+    ${htmlBaris("Nilai investasi", rp(nilaiInv))}
+  </div>
+  ${htmlBulan()}
+  <div class="card">
+    <h3>Arus Kas</h3>
+    ${htmlBaris("Pemasukan", rp(masuk), "hijau")}
+    ${htmlBaris("Pengeluaran", rp(keluar), "merah")}
+    ${htmlBaris("Selisih", rpTanda(masuk - keluar), warna(masuk - keluar) + " tebal")}
+    ${masuk > 0 ? `<small class="muted">Rasio tabungan: ${Math.round(((masuk - keluar) / masuk) * 100)}% dari pemasukan</small>` : ""}
+  </div>
+  <div class="card">
+    <h3>Pengeluaran per Kategori</h3>
+    ${kat.length ? kat.map(([k, v]) => htmlBar(k, v, keluar, "merah")).join("") : '<p class="muted">Belum ada pengeluaran di bulan ini.</p>'}
+  </div>
+  <div class="card">
+    <h3>Investasi</h3>
+    ${htmlBaris("Total modal", rp(modalInv))}
+    ${htmlBaris("Nilai sekarang", rp(nilaiInv))}
+    ${htmlBaris("Untung/Rugi", rpTanda(untung) + (modalInv > 0 ? ` (${persen((untung / modalInv) * 100)})` : ""), warna(untung) + " tebal")}
+  </div>`;
+}
+
+function htmlTransaksi() {
+  const tb = data.transaksi.filter(t => t.tanggal.startsWith(bulan));
+  const masuk = total(tb.filter(t => t.pemasukan), t => t.jumlah);
+  const keluar = total(tb.filter(t => !t.pemasukan), t => t.jumlah);
+  let h = htmlBulan() + `
+  <div class="card ringkas">
+    <div><small class="muted">Masuk</small><b class="hijau">${rp(masuk)}</b></div>
+    <div><small class="muted">Keluar</small><b class="merah">${rp(keluar)}</b></div>
+    <div><small class="muted">Selisih</small><b class="${warna(masuk - keluar)}">${rp(masuk - keluar)}</b></div>
+  </div>`;
+  if (!tb.length) return h + '<p class="kosong">Belum ada transaksi di bulan ini.<br>Tekan "+ Transaksi" untuk mencatat.</p>';
+  const perHari = {};
+  tb.forEach(t => (perHari[t.tanggal] = perHari[t.tanggal] || []).push(t));
+  for (const [tgl, list] of Object.entries(perHari)) {
+    const bersih = total(list, t => (t.pemasukan ? t.jumlah : -t.jumlah));
+    h += `<div class="hari"><span>${fmtTgl(tgl, { weekday: "long", day: "numeric", month: "long" })}</span><small>${rpTanda(bersih)}</small></div>`;
+    h += list.map(t => `
+      <div class="card item" data-aksi="edit-trx" data-id="${esc(t.id)}">
+        <div class="kiri"><b>${esc(t.kategori)}</b>${t.catatan ? `<small class="muted">${esc(t.catatan)}</small>` : ""}</div>
+        <b class="${t.pemasukan ? "hijau" : "merah"}">${t.pemasukan ? "+" : "-"}${rp(t.jumlah)}</b>
+      </div>`).join("");
+  }
+  return h;
+}
+
+function htmlInvestasi() {
+  const modal = total(data.investasi, i => i.modal);
+  const nilai = total(data.investasi, i => i.nilai);
+  const untung = nilai - modal;
+  const perJenis = {};
+  data.investasi.forEach(i => (perJenis[i.jenis] = (perJenis[i.jenis] || 0) + i.nilai));
+  const jenis = Object.entries(perJenis).sort((a, b) => b[1] - a[1]);
+  const list = [...data.investasi].sort((a, b) => b.nilai - a.nilai);
+  return `
+  <div class="card hero">
+    <small>Nilai Portofolio</small>
+    <div class="besar">${rp(nilai)}</div>
+    ${modal > 0 ? `<div class="${warna(untung)} tebal" style="margin:-8px 0 10px">${rpTanda(untung)} (${persen((untung / modal) * 100)})</div>` : ""}
+    ${htmlBaris("Total modal", rp(modal))}
+    ${htmlBaris("Jumlah aset", list.length)}
+  </div>
+  ${jenis.length ? `<div class="card"><h3>Alokasi Aset</h3>${jenis.map(([j, v]) => htmlBar(j, v, nilai)).join("")}</div>` : ""}
+  ${list.length ? '<p class="muted kecil">Ketuk aset untuk memperbarui nilainya</p>' : '<p class="kosong">Belum ada investasi.<br>Tekan "+ Investasi" untuk menambah.</p>'}
+  ${list.map(i => {
+    const u = i.nilai - i.modal;
+    return `
+    <div class="card item2" data-aksi="edit-inv" data-id="${esc(i.id)}">
+      <div class="baris">
+        <div class="kiri"><b>${esc(i.nama)}</b><small class="muted">${esc(i.jenis)} · sejak ${fmtTgl(i.tanggal, { day: "numeric", month: "short", year: "numeric" })}</small></div>
+        <b>${rp(i.nilai)}</b>
+      </div>
+      <div class="baris">
+        <small class="muted">Modal ${rp(i.modal)}</small>
+        <small class="${warna(u)} tebal">${rpTanda(u)} (${persen(i.modal > 0 ? (u / i.modal) * 100 : 0)})</small>
+      </div>
+    </div>`;
+  }).join("")}`;
+}
+
+function render() {
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  $("judul").textContent = { ringkasan: "Catatan Keuangan", transaksi: "Transaksi", investasi: "Investasi" }[tab];
+  $("fab").textContent = tab === "investasi" ? "+ Investasi" : "+ Transaksi";
+  $("isi").innerHTML = tab === "ringkasan" ? htmlRingkasan() : tab === "transaksi" ? htmlTransaksi() : htmlInvestasi();
+}
+
+// ===== Input Rupiah (otomatis 1.500.000) =====
+function pasangInputRupiah(el, lalu) {
+  el.addEventListener("input", () => {
+    const n = el.value.replace(/\D/g, "").replace(/^0+/, "").slice(0, 15);
+    el.value = n ? fmt.format(Number(n)) : "";
+    lalu();
+  });
+}
+const chipHtml = (opsi, terpilih) =>
+  opsi.map(k => `<button type="button" class="chip ${k === terpilih ? "on" : ""}" data-k="${esc(k)}">${esc(k)}</button>`).join("");
+
+let edit = null;
+
+// ===== Form transaksi =====
+let jenisTrx = "keluar", katTrx = "";
+function validasiTrx() {
+  $("simpanTrx").disabled = !(angkaDari($("jumlahTrx").value) > 0 && katTrx);
+}
+function gambarTrx() {
+  document.querySelectorAll("#jenisTrx .chip").forEach(c => c.classList.toggle("on", c.dataset.v === jenisTrx));
+  const opsi = jenisTrx === "masuk" ? KATEGORI_MASUK : KATEGORI_KELUAR;
+  if (!opsi.includes(katTrx)) katTrx = "";
+  $("katTrx").innerHTML = chipHtml(opsi, katTrx);
+  validasiTrx();
+}
+function bukaTrx(t) {
+  edit = t ? t.id : null;
+  jenisTrx = t ? (t.pemasukan ? "masuk" : "keluar") : "keluar";
+  katTrx = t ? t.kategori : "";
+  $("judulTrx").textContent = t ? "Ubah Transaksi" : "Tambah Transaksi";
+  $("jumlahTrx").value = t ? fmt.format(t.jumlah) : "";
+  $("tglTrx").value = t ? t.tanggal : hariIni();
+  $("catTrx").value = t ? t.catatan : "";
+  $("hapusTrx").hidden = !t;
+  gambarTrx();
+  $("dlgTrx").showModal();
+}
+$("jenisTrx").onclick = e => { const c = e.target.closest(".chip"); if (c) { jenisTrx = c.dataset.v; gambarTrx(); } };
+$("katTrx").onclick = e => { const c = e.target.closest(".chip"); if (c) { katTrx = c.dataset.k; gambarTrx(); } };
+pasangInputRupiah($("jumlahTrx"), validasiTrx);
+$("simpanTrx").onclick = () => {
+  const t = {
+    id: edit || idBaru(), pemasukan: jenisTrx === "masuk", jumlah: angkaDari($("jumlahTrx").value),
+    kategori: katTrx, catatan: $("catTrx").value.trim(), tanggal: $("tglTrx").value || hariIni()
+  };
+  data.transaksi = data.transaksi.filter(x => x.id !== t.id).concat(t);
+  urutkan(); simpan();
+  bulan = t.tanggal.slice(0, 7);
+  $("dlgTrx").close(); render();
+};
+$("hapusTrx").onclick = () => {
+  if (!confirm("Hapus transaksi ini?")) return;
+  data.transaksi = data.transaksi.filter(x => x.id !== edit);
+  simpan(); $("dlgTrx").close(); render();
+};
+
+// ===== Form investasi =====
+let jenisInv = JENIS_INVESTASI[0];
+function validasiInv() {
+  const m = angkaDari($("modalInv").value);
+  const n = $("nilaiInv").value ? angkaDari($("nilaiInv").value) : m;
+  const u = n - m;
+  $("pratinjauInv").innerHTML = m > 0 ? `Untung/rugi: <b class="${warna(u)}">${rpTanda(u)} (${persen((u / m) * 100)})</b>` : "";
+  $("simpanInv").disabled = !($("namaInv").value.trim() && m > 0);
+}
+function gambarInv() {
+  $("jenisInv").innerHTML = chipHtml(JENIS_INVESTASI, jenisInv);
+  validasiInv();
+}
+function bukaInv(i) {
+  edit = i ? i.id : null;
+  jenisInv = i ? i.jenis : JENIS_INVESTASI[0];
+  $("judulInv").textContent = i ? "Perbarui Investasi" : "Tambah Investasi";
+  $("namaInv").value = i ? i.nama : "";
+  $("modalInv").value = i ? fmt.format(i.modal) : "";
+  $("nilaiInv").value = i ? fmt.format(i.nilai) : "";
+  $("tglInv").value = i ? i.tanggal : hariIni();
+  $("catInv").value = i ? i.catatan : "";
+  $("catatKeluar").checked = false;
+  $("barisCatat").hidden = !!i;
+  $("hapusInv").hidden = !i;
+  gambarInv();
+  $("dlgInv").showModal();
+}
+$("jenisInv").onclick = e => { const c = e.target.closest(".chip"); if (c) { jenisInv = c.dataset.k; gambarInv(); } };
+$("namaInv").oninput = validasiInv;
+pasangInputRupiah($("modalInv"), validasiInv);
+pasangInputRupiah($("nilaiInv"), validasiInv);
+$("simpanInv").onclick = () => {
+  const m = angkaDari($("modalInv").value);
+  const inv = {
+    id: edit || idBaru(), nama: $("namaInv").value.trim(), jenis: jenisInv, modal: m,
+    nilai: $("nilaiInv").value ? angkaDari($("nilaiInv").value) : m,
+    tanggal: $("tglInv").value || hariIni(), catatan: $("catInv").value.trim()
+  };
+  data.investasi = data.investasi.filter(x => x.id !== inv.id).concat(inv);
+  if (!edit && $("catatKeluar").checked) {
+    data.transaksi.push({ id: idBaru(), pemasukan: false, jumlah: m, kategori: "Investasi", catatan: "Beli " + inv.nama, tanggal: inv.tanggal });
+    urutkan();
+  }
+  simpan(); $("dlgInv").close(); render();
+};
+$("hapusInv").onclick = () => {
+  if (!confirm("Hapus investasi ini?")) return;
+  data.investasi = data.investasi.filter(x => x.id !== edit);
+  simpan(); $("dlgInv").close(); render();
+};
+
+// ===== Dialog umum =====
+document.querySelectorAll("[data-tutup]").forEach(b => (b.onclick = () => b.closest("dialog").close()));
+document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d) d.close(); }));
+
+// ===== Navigasi =====
+document.querySelector("nav").onclick = e => {
+  const b = e.target.closest("button");
+  if (b) { tab = b.dataset.tab; render(); window.scrollTo(0, 0); }
+};
+$("fab").onclick = () => (tab === "investasi" ? bukaInv(null) : bukaTrx(null));
+$("isi").onclick = e => {
+  const el = e.target.closest("[data-aksi]");
+  if (!el) return;
+  const a = el.dataset.aksi;
+  if (a === "bulan") { bulan = geserBulan(bulan, Number(el.dataset.n)); render(); }
+  else if (a === "edit-trx") bukaTrx(data.transaksi.find(t => String(t.id) === el.dataset.id));
+  else if (a === "edit-inv") bukaInv(data.investasi.find(i => String(i.id) === el.dataset.id));
+};
+
+// ===== Menu: Backup, Restore, Ekspor =====
+function unduh(nama, isi, tipe) {
+  const url = URL.createObjectURL(new Blob([isi], { type: tipe }));
+  const a = document.createElement("a");
+  a.href = url; a.download = nama;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+function backup() {
+  const isi = JSON.stringify({ aplikasi: "catatan-keuangan", versi: 1, dibuat: new Date().toISOString(), ...data }, null, 2);
+  unduh(`backup-keuangan-${hariIni()}.json`, isi, "application/json");
+  toast("Backup disimpan di folder Download ✔");
+}
+function eksporCsv() {
+  const q = s => '"' + String(s).replace(/"/g, '""') + '"';
+  const baris = [
+    ["TRANSAKSI"], ["Tanggal", "Jenis", "Kategori", "Jumlah", "Catatan"],
+    ...data.transaksi.map(t => [t.tanggal, t.pemasukan ? "Pemasukan" : "Pengeluaran", q(t.kategori), t.jumlah, q(t.catatan)]),
+    [], ["INVESTASI"], ["Tanggal Beli", "Nama", "Jenis", "Modal", "Nilai Sekarang", "Untung/Rugi", "Catatan"],
+    ...data.investasi.map(i => [i.tanggal, q(i.nama), q(i.jenis), i.modal, i.nilai, i.nilai - i.modal, q(i.catatan)])
+  ];
+  unduh(`keuangan-${hariIni()}.csv`, "\uFEFF" + baris.map(b => b.join(";")).join("\r\n"), "text/csv");
+  toast("File CSV disimpan di folder Download ✔");
+}
+const tglValid = t => (/^\d{4}-\d{2}-\d{2}$/.test(t) ? t : hariIni());
+const normTrx = t => ({
+  id: String(t.id ?? idBaru()), pemasukan: !!t.pemasukan, jumlah: Math.round(Number(t.jumlah)) || 0,
+  kategori: String(t.kategori ?? "Lainnya"), catatan: String(t.catatan ?? ""), tanggal: tglValid(t.tanggal)
+});
+const normInv = i => ({
+  id: String(i.id ?? idBaru()), nama: String(i.nama ?? "Aset"), jenis: String(i.jenis ?? "Lainnya"),
+  modal: Math.round(Number(i.modal)) || 0, nilai: Math.round(Number(i.nilai)) || 0,
+  tanggal: tglValid(i.tanggal), catatan: String(i.catatan ?? "")
+});
+$("fileRestore").onchange = async e => {
+  const f = e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  try {
+    const o = JSON.parse(await f.text());
+    if (!Array.isArray(o.transaksi) || !Array.isArray(o.investasi)) throw new Error();
+    if (!confirm(`Backup berisi ${o.transaksi.length} transaksi dan ${o.investasi.length} investasi.\n\nSemua data sekarang akan DIGANTI. Lanjutkan?`)) return;
+    data = { transaksi: o.transaksi.map(normTrx), investasi: o.investasi.map(normInv) };
+    urutkan(); simpan(); render();
+    toast("Data berhasil dipulihkan ✔");
+  } catch (err) {
+    toast("File ini bukan backup Catatan Keuangan yang valid");
+  }
+};
+$("tombolMenu").onclick = e => { e.stopPropagation(); $("menu").hidden = !$("menu").hidden; };
+document.addEventListener("click", () => ($("menu").hidden = true));
+$("menu").onclick = e => {
+  const b = e.target.closest("[data-menu]");
+  if (!b) return;
+  $("menu").hidden = true;
+  if (b.dataset.menu === "backup") backup();
+  else if (b.dataset.menu === "restore") $("fileRestore").click();
+  else eksporCsv();
+};
+
+// ===== Offline =====
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+
+render();
+</script>
+</body>
+</html>
